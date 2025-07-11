@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Portaria 07 - Controle de Chassi</title>
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&amp;display=swap" rel="stylesheet"/>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script><script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script><script defer="" src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+<style>
+    :root {
+      --cor-fundo: #0b1d30;
+      --cor-caixa: #1c2b3d;
+      --cor-primaria: #00d2ff;
+      --cor-hover: #1a4ed8;
+      --cor-texto: #ffffff;
+      --cor-alerta: #f0ad4e;
+      --cor-erro: #ff4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 1rem;
+      font-family: 'Orbitron', sans-serif;
+      background-color: var(--cor-fundo);
+      background-image: radial-gradient(circle at top left, #1b2735, #090a0f);
+      color: var(--cor-texto);
+    }
+    .container {
+      max-width: 920px;
+      margin: auto;
+      background: rgba(28,43,61,0.6);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(0,212,255,0.15);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0,255,255,0.15), inset 0 0 10px rgba(0,255,255,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    h1 {
+      font-size: 1.8rem;
+      letter-spacing: 6px;
+      background: linear-gradient(90deg, var(--cor-primaria), #3a7bd5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 10px rgba(0,210,255,0.5);
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--cor-primaria);
+      opacity: 0.85;
+      margin-bottom: 1.5rem;
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+    }
+    h3 {
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      color: var(--cor-primaria);
+      opacity: 0.85;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: flex;
+      flex-direction: column;
+      margin-top: 0.5rem;
+      font-family: Arial, sans-serif;
+    }
+    input, select {
+      margin-top: 0.4rem;
+      padding: 0.7rem;
+      border: 1px solid #00d2ff44;
+      border-radius: 12px;
+      font-size: 1rem;
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      backdrop-filter: blur(4px);
+      box-shadow: inset 0 0 8px rgba(0,210,255,0.1);
+      transition: all .2s;
+      font-family: Arial, sans-serif;
+    }
+    button {
+      background: linear-gradient(135deg, #3a7bd5, var(--cor-primaria));
+      color: #fff;
+      border: 1px solid var(--cor-primaria);
+      padding: .75rem 1.5rem;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--cor-primaria)66, 0 0 10px var(--cor-primaria)33;
+      transition: all .3s;
+      font-family: 'Orbitron', sans-serif;
+    }
+    button:hover {
+      background: linear-gradient(135deg, var(--cor-primaria), #3a7bd5);
+      box-shadow: 0 0 20px rgba(0,210,255,.85);
+      transform: scale(1.05);
+    }
+    button i { vertical-align: middle; stroke-width: 2; }
+    .button-group { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; }
+    .auto-save-icon {
+      text-align: right;
+      font-size: .85rem;
+      color: #55dd55;
+      font-family: Arial, sans-serif;
+    }
+    .info {
+      font-weight: bold;
+      text-align: center;
+      color: var(--cor-alerta);
+      font-family: Arial, sans-serif;
+    }
+    .info[aria-live] { min-height: 1.2em; }
+    #tabelaContainer { display: none; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: .95rem;
+      font-family: Arial, sans-serif;
+    }
+    th, td {
+      border: 1px solid #2e3c51;
+      padding: .6rem;
+      text-align: center;
+      color: var(--cor-texto);
+    }
+    th { background: #233246; color: var(--cor-primaria); }
+    @media(max-width:600px) {
+      .container { padding: 1rem; }
+      .button-group { flex-direction: column; }
+      button { width: 100%; justify-content: center; }
+      .auto-save-icon { text-align: center; margin-top: .5rem; }
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="container">
+<h1>STELLANTIS</h1>
+<h2>Segurança Patrimonial</h2>
+<h3>Controle de veículos - Industrialização</h3>
+<label>Setor:
+      <input id="setor" readonly="" type="text" value="Portaria 07"/>
+</label>
+<label>Turno:
+      <select id="turno"><option>1º</option><option>2º</option><option>3º</option></select>
+</label>
+<label>Número de chassi:
+      <input autocomplete="off" id="numeroChassi" type="text"/>
+  <span id="iconeConfirmacao" style="display:none; margin-left:10px;vertical-align:middle; color:#55dd55;">
+    <i data-feather="check-circle"></i>
+  </span>
+</label>
+<label>Controlador de acesso:
+      <input id="controladorAcesso" type="text"/>
+</label>
+<div aria-live="polite" class="info" id="info"></div>
+<div class="auto-save-icon">💾 Salvamento automático</div>
+<div class="button-group">
+<button onclick="adicionarItem()"><i data-feather="plus-circle"></i>Adicionar</button>
+<button onclick="gerarPlanilha()"><i data-feather="file-text"></i>Gerar Excel</button>
+<button onclick="desfazerUltimo()"><i data-feather="rotate-ccw"></i>Desfazer</button>
+<button onclick="finalizarTurno()"><i data-feather="check-circle"></i>Finalizar Turno</button>
+<button id="btnToggleTabela" onclick="toggleTabela()"><i data-feather="eye"></i>Visualizar Tabela</button>
+<button onclick="sair()"><i data-feather="log-out"></i>Sair</button>
+
+<div id="totalVeiculos" style="font-weight:bold; color:#00d2ff; text-align:center; font-size:1.1rem; margin-top:10px;">Total de veículos: 0</div>
+</div>
+<div id="tabelaContainer">
+<table id="tabelaChassi">
+<thead>
+<tr><th>Setor</th><th>Turno</th><th>Controlador de acesso</th><th>Número de chassi</th><th>Data e Hora</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      feather.replace();
+
+document.getElementById("numeroChassi").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    window.adicionarItem();
+  }
+});
+
+      const tabelaDados = JSON.parse(localStorage.getItem("tabelaChassi")) || [];
+      function salvarLocal() { localStorage.setItem("tabelaChassi", JSON.stringify(tabelaDados)); }
+      function atualizarTabela() {
+        const tbody = document.querySelector("#tabelaChassi tbody");
+        tbody.innerHTML = "";
+  document.getElementById("totalVeiculos").textContent = "Total de veículos: " + tabelaDados.length;
+        tabelaDados.forEach(item => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${item.setor}</td><td>${item.turno}</td><td>${item.controlador}</td><td>${item.chassi}</td><td>${item.dataHora}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+      window.adicionarItem = () => {
+        const info = document.getElementById("info");
+        const chassi = document.getElementById("numeroChassi").value.trim();
+        const controlador = document.getElementById("controladorAcesso").value.trim();
+        if (!chassi) return info.textContent = "Digite o número de chassi.";
+        if (!controlador) return info.textContent = "Preencha o controlador de acesso.";
+        tabelaDados.push({
+          setor: document.getElementById("setor").value,
+          turno: document.getElementById("turno").value,
+          controlador: controlador,
+          chassi: chassi,
+          dataHora: new Date().toLocaleString("pt-BR")
+        });
+        salvarLocal();
+        atualizarTabela();
+document.getElementById("totalVeiculos").textContent = "Total de veículos: " + tabelaDados.length;
+        const campoChassi = document.getElementById("numeroChassi");
+campoChassi.value = "";
+campoChassi.focus();
+        info.textContent = `N° de chassi adicionado - ${chassi}`;
+  // Trecho para mostrar o ícone de confirmação
+  const icone = document.getElementById("iconeConfirmacao");
+  icone.style.display = "inline";
+  feather.replace();
+  setTimeout(() => {
+    icone.style.display = "none";
+  }, 1500);
+
+      };
+      window.desfazerUltimo = () => {
+        const info = document.getElementById("info");
+        if (!tabelaDados.length) return info.textContent = "Nada para desfazer.";
+        tabelaDados.pop();
+        salvarLocal();
+        atualizarTabela();
+        info.textContent = "Último item removido.";
+      };
+      window.gerarPlanilha = () => {
+        const info = document.getElementById("info");
+        if (!tabelaDados.length) return info.textContent = "Nada para exportar.";
+        const dadosExcel = tabelaDados.map(({ setor, turno, controlador, chassi, dataHora }) => ({
+          Setor: setor, Turno: turno, "Controlador de acesso": controlador,
+          "Número de chassi": chassi, "Data e Hora": dataHora
+        }));
+        const ws = XLSX.utils.json_to_sheet(dadosExcel);
+const totalLinha = [["", "", "", "Total de número de chassi", tabelaDados.length]];
+XLSX.utils.sheet_add_aoa(ws, totalLinha, { origin: -1 });
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "ControleChassi");
+        XLSX.writeFile(wb, `ControleChassi_${new Date().toISOString().slice(0,19).replace(/[T:]/g,"_")}.xlsx`);
+        info.textContent = "Planilha gerada.";
+      };
+      window.finalizarTurno = () => {
+        const info = document.getElementById("info");
+        if (!confirm("Deseja finalizar o turno?")) return;
+        tabelaDados.length = 0; salvarLocal(); atualizarTabela();
+        info.textContent = "Turno finalizado.";
+      };
+      window.toggleTabela = () => {
+        const container = document.getElementById("tabelaContainer");
+        const btn = document.getElementById("btnToggleTabela");
+        const isHidden = !container.style.display || container.style.display === "none";
+        container.style.display = isHidden ? "block" : "none";
+        btn.innerHTML = isHidden
+          ? '<i data-feather="eye-off"></i>Ocultar Tabela'
+          : '<i data-feather="eye"></i>Visualizar Tabela';
+        feather.replace();
+      };
+      // Load drafts
+      document.getElementById('numeroChassi').value = localStorage.getItem('draftChassi') || '';
+      document.getElementById('controladorAcesso').value = localStorage.getItem("usuario") + " / " + localStorage.getItem("registro");
+      atualizarTabela();
+    });
+    window.addEventListener('beforeunload', () => {
+      localStorage.setItem('draftChassi', document.getElementById('numeroChassi').value);
+      localStorage.setItem('draftControlador', document.getElementById('controladorAcesso').value);
+    });
+  
+window.sair = () => {
+  if (confirm("Tem certeza que deseja sair?")) {
+    window.location.href = 'interface_principal.html';
+  }
+};
+</script>
+</body>
+</html>
