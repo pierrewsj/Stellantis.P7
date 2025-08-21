@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stellantis - Menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<style>
+    :root { --cor-fundo:#0b1d30; --cor-caixa:#1c2b3d; --cor-primaria:#00d2ff; --cor-secundaria:#FFA726; --cor-texto:#ffffff; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:'Orbitron',sans-serif; background-color:var(--cor-fundo); background-image:radial-gradient(circle at top left,#1b2735,#090a0f); color:var(--cor-texto); padding:1rem; display:flex; justify-content:center; align-items:center; min-height:100vh; }
+    .container { max-width:400px; width:90%; background:rgba(28,43,61,0.95); padding:2rem; border-radius:20px; box-shadow:0 0 30px rgba(0,255,255,0.15), inset 0 0 10px rgba(0,255,255,0.05); backdrop-filter:blur(10px); animation:fadeInUp .6s ease-in-out; text-align:center; }
+    h1 { font-size:1.8rem; letter-spacing:6px; background:linear-gradient(90deg,var(--cor-primaria),#3a7bd5); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight:800; text-shadow:0 0 10px rgba(0,210,255,0.5); margin-bottom:.5rem; }
+    .botoes { display:flex; flex-direction:column; gap:1rem; }
+    .botao { background:linear-gradient(135deg,#3a7bd5,var(--cor-primaria)); color:var(--cor-texto); border:1px solid var(--cor-primaria); padding:.75rem 1.5rem; border-radius:14px; font-size:1rem; font-weight:600; cursor:pointer; box-shadow:0 0 6px rgba(0,210,255,0.3); transition:all .3s; }
+    .botao:hover { transform:scale(1.03); box-shadow:0 0 10px rgba(0,210,255,0.45); }
+    .usuario { margin-top:1rem; font-size:.9rem; color:#9eefff; font-family:'Inter',sans-serif; }
+    .modal-overlay { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:1000; }
+    .modal { background:var(--cor-caixa); padding:1.5rem; border-radius:12px; text-align:center; max-width:320px; box-shadow:0 0 20px rgba(0,0,0,0.3); }
+    .modal p { margin-bottom:1rem; }
+    .modal button { background:var(--cor-secundaria); border:none; padding:.5rem 1rem; border-radius:8px; font-weight:bold; color:white; cursor:pointer; }
+    @keyframes fadeInUp { from{opacity:0; transform:translateY(15px);} to{opacity:1; transform:translateY(0);} }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
+</head>
+<body>
+<div class="container">
+<h1>STELLANTIS</h1>
+<h2 style="color: var(--cor-primaria); font-size: 1.2rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0.85; text-align: center; font-family: 'Orbitron', sans-serif;">Segurança Patrimonial</h2>
+<div class="botoes">
+<button class="botao" onclick="location.href='controle_p7_industrializacao.html'">Veículos - Industrialização</button>
+<button class="botao" onclick="location.href='controle_p7_comissao_seguro.html'">Veículos - Comissão Seguro</button>
+<button class="botao" onclick="location.href='controle_p7_qualidade.html'">Veículos - Qualidade</button>
+<button class="botao" onclick="location.href='controle_p7_ci_email.html'">Veículos - CI / E-mail</button>
+<button class="botao" onclick="finalizarTurno()">Finalizar turno</button>
+</div>
+<div class="usuario" id="usuarioExibido"></div>
+</div>
+<div class="modal-overlay" id="appModalOverlay">
+<div class="modal" id="appModalBox" style="animation: fadeInUp .2s ease;">
+<h3 id="appModalTitle" style="margin-top:0;margin-bottom:.5rem;">Aviso</h3>
+<p id="appModalMsg">Mensagem</p>
+<div style="display:flex;gap:.5rem;justify-content:center;margin-top:.75rem;"><button id="appModalOk">OK</button></div>
+</div>
+</div>
+<div class="modal-overlay" id="confirmModalOverlay">
+<div class="modal" id="confirmModalBox" style="animation: fadeInUp .2s ease;">
+<h3 id="confirmModalTitle" style="margin-top:0;margin-bottom:.5rem;">Confirmação</h3>
+<p id="confirmModalMsg">Tem certeza?</p>
+<div style="display:flex;gap:.5rem;justify-content:center;margin-top:.75rem;">
+<button id="confirmYes">Sim</button>
+<button id="confirmNo">Cancelar</button>
+</div>
+</div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const u = localStorage.getItem("usuario")||"", r = localStorage.getItem("registro")||"";
+  if(u||r) document.getElementById("usuarioExibido").textContent = `👤 ${u}${r?" / "+r:""}`;
+});
+
+function showAppModal({title="Aviso", message="", onOk=null}){
+  const ov = document.getElementById('appModalOverlay');
+  const t  = document.getElementById('appModalTitle');
+  const m  = document.getElementById('appModalMsg');
+  const ok = document.getElementById('appModalOk');
+  t.textContent = title; m.textContent = message; ov.style.display = 'flex';
+  const cleanup = () => { ov.style.display = 'none'; ok.onclick = null; if (onOk) try { onOk(); } catch(e){} };
+  ok.onclick = cleanup; ov.onclick = (e)=>{ if(e.target===ov) cleanup(); };
+}
+
+function showConfirmModal({title="Confirmação", message="", onYes=null, onNo=null}){
+  const ov = document.getElementById('confirmModalOverlay');
+  const t  = document.getElementById('confirmModalTitle');
+  const m  = document.getElementById('confirmModalMsg');
+  const yes= document.getElementById('confirmYes');
+  const no = document.getElementById('confirmNo');
+  t.textContent = title; m.textContent = message; ov.style.display = 'flex';
+  const cleanup = () => { ov.style.display = 'none'; yes.onclick = null; no.onclick = null; };
+  yes.onclick = ()=>{ cleanup(); if (onYes) try { onYes(); } catch(e){} };
+  no.onclick  = ()=>{ cleanup(); if (onNo)  try { onNo();  } catch(e){} };
+  ov.onclick  = (e)=>{ if(e.target===ov){ cleanup(); if(onNo) try{ onNo(); } catch(e){} } };
+}
+
+async function finalizarTurno(){
+  try {
+    const dadosChassi     = JSON.parse(localStorage.getItem('tabelaChassi') || '[]');
+    const dadosComissao   = JSON.parse(localStorage.getItem('tabelaComissaoSeguro') || '[]');
+    const dadosQualidade  = JSON.parse(localStorage.getItem('tabelaQualidade') || '[]');
+    const dadosCIEmail    = JSON.parse(localStorage.getItem('tabelaCIEmail') || '[]');
+
+    const semDados = (!dadosChassi?.length) && (!dadosComissao?.length) && (!dadosQualidade?.length) && (!dadosCIEmail?.length);
+    if (semDados) {
+      showAppModal({ title:'Atenção', message:'Não há dados para exportar.', onOk: ()=>{ location.href='index.html'; } });
+      return;
+    }
+
+    showConfirmModal({
+      title: 'Confirmação',
+      message: 'Tem certeza que deseja exportar dados e sair?',
+      onYes: async () => { await exportarPlanilhaFinal(dadosChassi, dadosComissao, dadosQualidade, dadosCIEmail); },
+      onNo: () => {}
+    });
+  } catch (e) {
+    console.error(e);
+    showAppModal({title:'Erro', message:'Erro ao processar a finalização.'});
+  }
+}
+
+async function exportarPlanilhaFinal(dadosChassi, dadosComissao, dadosQualidade, dadosCIEmail){
+  if (!window.ExcelJS || !window.saveAs) {
+    showAppModal({title:'Erro', message:'Bibliotecas ExcelJS/FileSaver não carregadas.'});
+    return;
+  }
+  try {
+    const workbook = new ExcelJS.Workbook();
+
+    // Industrialização (sem Observação)
+    const ws1 = workbook.addWorksheet('controle de veículos industrialização');
+    ws1.columns = [
+      { header:'Setor', key:'setor', width:18 },
+      { header:'Turno', key:'turno', width:12 },
+      { header:'Controlador de acesso', key:'controlador', width:24 },
+      { header:'Número de chassi', key:'chassi', width:22 },
+      { header:'Data e Hora', key:'dataHora', width:22 }
+    ];
+    (dadosChassi||[]).forEach(r => ws1.addRow(r));
+
+    // Comissão de Seguro (sem Observação)
+    const ws2 = workbook.addWorksheet('comissão de seguro');
+    ws2.columns = ws1.columns;
+    (dadosComissao||[]).forEach(r => ws2.addRow(r));
+
+    // Qualidade (COM Observação)
+    const ws3 = workbook.addWorksheet('controle de veículos qualidade');
+    ws3.columns = [
+      { header:'Setor', key:'setor', width:18 },
+      { header:'Turno', key:'turno', width:12 },
+      { header:'Controlador de acesso', key:'controlador', width:24 },
+      { header:'Número de chassi', key:'chassi', width:22 },
+      { header:'Observação', key:'observacao', width:28 },
+      { header:'Data e Hora', key:'dataHora', width:22 }
+    ];
+    (dadosQualidade||[]).forEach(r => ws3.addRow(r));
+
+    // CI / E-mail (COM Observação)
+    const ws4 = workbook.addWorksheet('CI / E-mail');
+    ws4.columns = [
+      { header:'Setor', key:'setor', width:18 },
+      { header:'Turno', key:'turno', width:12 },
+      { header:'Controlador de acesso', key:'controlador', width:24 },
+      { header:'Número de chassi', key:'chassi', width:22 },
+      { header:'Observação', key:'observacao', width:28 },
+      { header:'Data e Hora', key:'dataHora', width:22 }
+    ];
+    (dadosCIEmail||[]).forEach(r => ws4.addRow(r));
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const turnoNome = localStorage.getItem('turno') || 'Turno';
+    const agora = new Date();
+    const dd = String(agora.getDate()).padStart(2,'0');
+    const mm = String(agora.getMonth()+1).padStart(2,'0');
+    const yyyy = String(agora.getFullYear());
+    const HH = String(agora.getHours()).padStart(2,'0');
+    const MM = String(agora.getMinutes()).padStart(2,'0');
+    const nome = `Relatório - ${turnoNome} - ${dd}-${mm}-${yyyy} - ${HH}h${MM}.xlsx`;
+    saveAs(new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), nome);
+
+    localStorage.clear();
+    if (sessionStorage && sessionStorage.clear) sessionStorage.clear();
+    showAppModal({ title:'Turno finalizado', message:'A planilha foi gerada e o turno foi finalizado.', onOk: ()=>{ location.href='index.html'; } });
+    setTimeout(()=>{ location.href='index.html'; }, 1500);
+  } catch (e) {
+    console.error(e);
+  
+</body>
+</html>
