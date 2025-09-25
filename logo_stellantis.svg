@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 240">
+  <!-- Fundo transparente por padrão -->
+  <g fill="#FFFFFF">
+    <!-- Texto STELLANTIS estilizado simples -->
+    <text x="50" y="165" font-family="Orbitron, Arial, sans-serif" font-weight="700" font-size="150" letter-spacing="14">STELLANTIS</text>
+    <!-- Halo de pontos (simplificado) ao redor da letra A (aprox. posição x=640) -->
+    <g>
+      <!-- centro aproximado do A -->
+      <circle cx="645" cy="120" r="3"/>
+      <!-- anel de pontos -->
+      <!-- 24 pontos ao redor -->
+      <!-- Pequena função manual: ângulos e raios definidos -->
+      <!-- inner ring -->
+      <circle cx="645" cy="90" r="2"/>
+      <circle cx="671" cy="96" r="2"/>
+      <circle cx="690" cy="115" r="2"/>
+      <circle cx="671" cy="144" r="2"/>
+      <circle cx="645" cy="150" r="2"/>
+      <circle cx="619" cy="144" r="2"/>
+      <circle cx="600" cy="115" r="2"/>
+      <circle cx="619" cy="96" r="2"/>
+      <!-- outer ring -->
+      <circle cx="645" cy="60" r="3"/>
+      <circle cx="690" cy="70" r="3"/>
+      <circle cx="715" cy="105" r="3"/>
+      <circle cx="715" cy="135" r="3"/>
+      <circle cx="690" cy="170" r="3"/>
+      <circle cx="645" cy="180" r="3"/>
+      <circle cx="600" cy="170" r="3"/>
+      <circle cx="575" cy="135" r="3"/>
+      <circle cx="575" cy="105" r="3"/>
+      <circle cx="600" cy="70" r="3"/>
+    </g>
+  </g>
+</svg>
