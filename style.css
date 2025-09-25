@@ -48,7 +48,7 @@ h1{
   background:linear-gradient(90deg, var(--cor-primaria), #3a7bd5);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
-  text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.6);
+  text-shadow:0 0 10px rgba(0,210,255,0.5);
 }
 h2{ font-size:clamp(1rem, 1.2vw + .8rem, 1.25rem); color:var(--cor-primaria); opacity:.9; text-transform:uppercase; }
 h3{ font-size:clamp(.95rem, 1vw + .6rem, 1.05rem); color:var(--cor-primaria); opacity:.85; }
@@ -105,9 +105,10 @@ button:hover,.btn:hover{
 .info {
   font-weight: bold;
   text-align: center;
-  color: #ffffff;        /* amarelo vibrante */
+  color: #FFD54F;        /* amarelo vibrante */
   font-size: 2.2rem;     /* fonte maior */
-  text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.6); /* brilho */
+  text-shadow: 0 0 10px rgba(255, 213, 79, 0.9),
+               0 0 20px rgba(255, 213, 79, 0.7); /* brilho */
   background: rgba(0,0,0,0.45);
   padding: 0.6rem 1rem;
   border-radius: 10px;
